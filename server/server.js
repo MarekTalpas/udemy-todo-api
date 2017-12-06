@@ -14,8 +14,6 @@ app.post('/todos', (req, res) => {
     text: req.body.text
   });
 
-  console.log('req.body.text ', req.body.text);
-
   todoExample
     .save()
     .then((doc) => {
@@ -26,8 +24,19 @@ app.post('/todos', (req, res) => {
     });
 });
 
+app.get('/todos', (req, res) => {
+  Todo
+    .find()
+    .then((todos) => {
+      res.send({ todos });
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+});
+
 app.listen(PORT, () => {
-  console.log(`appis listening on the port ${PORT}`);
+  console.log(`app is listening on the port ${PORT}`);
 });
 
 module.exports = { app };
