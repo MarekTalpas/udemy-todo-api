@@ -1,3 +1,4 @@
+const { ObjectID } = require('mongodb');
 const request = require('supertest');
 const expect = require('expect');
 
@@ -5,10 +6,13 @@ const { app } = require('./../server');
 const { Todo } = require('./../models/todo');
 
 const testTodos = [{
+  _id: new ObjectID(),
   text: 'test todo 1'
 }, {
+  _id: new ObjectID(),
   text: 'test todo 2'
 }, {
+  _id: new ObjectID(),
   text: 'test todo 3'
 }];
 
@@ -79,4 +83,33 @@ describe('GET /todos', (done) => {
       })
       .end(done);
   });
+});
+
+describe('GET /todos/:id', (done) => {
+  it('should get correct todo by ID', () => {
+    request(app)
+      .get(`todos/${testTodos[0]._id.toHexString()}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(testTodos[0].text);
+      })
+      .end(done);
+  });
+
+  it('should get 404 when id is valid bot does not match with any todo', () => {
+    const id = new ObjectID().toHexString();
+    request(app)
+      .get(`todos/${id}`)
+      .expect(404)
+      .end(done)
+  });
+
+  it('should get 404 when id is not valid', () => {
+    const id = '123abc';
+    request(app)
+      .get(`todos/${id}`)
+      .expect(404)
+      .end(done)
+  });
+
 });
